@@ -9,6 +9,30 @@
 #import "SHChineseSort.h"
 #import <objc/runtime.h>
 
+#pragma mark ============== 自定义排序扩展 ==================
+// NSString + mySort.h
+@interface NSString (sort)
+- (NSComparisonResult)sort:(NSString *)str;
+@end
+
+@implementation NSString (sort)
+- (NSComparisonResult)sort:(NSString *)str {
+    NSString*s = [SHChineseSortSetting share].specialCharSectionTitle;
+    BOOL b = [SHChineseSortSetting share].specialCharPositionIsFront;
+    if ([self isEqualToString:s]){
+        //相同
+        if ([str isEqualToString:s]) {
+            return NSOrderedSame;
+        }
+        return b ? NSOrderedAscending : NSOrderedDescending;
+    }else if ([str isEqualToString:s]){
+        return b ? NSOrderedDescending : NSOrderedAscending;
+    }else{
+        return [self localizedStandardCompare:str];
+    }
+}
+@end
+
 
 @implementation SHChineseSortSetting
 
@@ -443,27 +467,5 @@ char pinyinFirstLetter(unsigned short hanzi){
 @end
 
 
-#pragma mark ============== 自定义排序扩展 ==================
-// NSString + mySort.h
-@interface NSString (sort)
-- (NSComparisonResult)sort:(NSString *)str;
-@end
 
-@implementation NSString (sort)
-- (NSComparisonResult)sort:(NSString *)str {
-    NSString*s = [SHChineseSortSetting share].specialCharSectionTitle;
-    BOOL b = [SHChineseSortSetting share].specialCharPositionIsFront;
-    if ([self isEqualToString:s]){
-        //相同
-        if ([str isEqualToString:s]) {
-            return NSOrderedSame;
-        }
-        return b ? NSOrderedAscending : NSOrderedDescending;
-    }else if ([str isEqualToString:s]){
-        return b ? NSOrderedDescending : NSOrderedAscending;
-    }else{
-        return [self localizedStandardCompare:str];
-    }
-}
-@end
 
