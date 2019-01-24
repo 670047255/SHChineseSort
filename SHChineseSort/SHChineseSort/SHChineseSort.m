@@ -40,22 +40,25 @@
     static SHChineseSortSetting * singleton = nil ;
     if (singleton == nil) {
         singleton = [[SHChineseSortSetting alloc] init];
-        [singleton defaultValue];
     }
     return singleton;
 }
 
--(void)defaultValue{
-    _specialCharSectionTitle = @"#";
-    _specialCharPositionIsFront = NO;
-    _ignoreModelWithPrefix = @"1";
-    _polyphoneMapping = [NSMutableDictionary dictionaryWithDictionary:
-                         @{@"长":@"C",
-                           @"沈":@"S",
-                           @"中":@"Z",
-                           @"会":@"H"
-                           }];
+- (instancetype)init{
+    if (self = [super init]) {
+        _specialCharSectionTitle = @"#";
+        _specialCharPositionIsFront = NO;
+        _ignoreModelWithPrefix = @"1";
+        _polyphoneMapping = [NSMutableDictionary dictionaryWithDictionary:
+                             @{@"长":@"C",
+                               @"沈":@"S",
+                               @"中":@"Z",
+                               @"会":@"H"
+                               }];
+    }
+    return self;
 }
+
 
 -(void)setPolyphoneMapping:(NSMutableDictionary *)polyphoneMapping{
     [_polyphoneMapping addEntriesFromDictionary:polyphoneMapping];
@@ -189,11 +192,11 @@
     //提出空白字符
     model.string = [model.string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if(model.string == nil || model.string.length == 0){
-        model.string = SHChineseSortSetting.share.specialCharSectionTitle;
+        model.string = [SHChineseSortSetting share].specialCharSectionTitle;
     }else{
         //过滤 ignoreModelWithPrefix
         NSString *prefix = [model.string substringToIndex:1];
-        if (![SHChineseSortSetting.share.ignoreModelWithPrefix containsString:prefix]) {
+        if (![[SHChineseSortSetting share].ignoreModelWithPrefix containsString:prefix]) {
             //获取拼音首字母
             model.pinYin = [SHChineseSort getFirstLetter:model.string];
         }else{
@@ -209,7 +212,7 @@
     //把已知的英文转为大写
     __block NSString* newChinese = [chinese uppercaseString];
     //吧多音字先替换
-    [SHChineseSortSetting.share.polyphoneMapping enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+    [[SHChineseSortSetting share].polyphoneMapping enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
         newChinese = [newChinese stringByReplacingOccurrencesOfString:key withString:obj];
     }];
     
@@ -229,7 +232,7 @@
     if ([upperCaseStr characterAtIndex:0] >= 'A' && [upperCaseStr characterAtIndex:0] <= 'Z') {
         return upperCaseStr;
     }else{//所有非字母的全分为 特殊字符分类中
-        return SHChineseSortSetting.share.specialCharSectionTitle;
+        return [SHChineseSortSetting share].specialCharSectionTitle;
     }
 }
 
